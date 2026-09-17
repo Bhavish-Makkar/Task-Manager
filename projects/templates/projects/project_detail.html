@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ project.name }} · TaskFlow{% endblock %}
+{% block content %}
+<section class="dashboard-card">
+    <div class="eyebrow">Project</div>
+    <h1>{{ project.name }}</h1>
+    <p class="helper">Owned by {{ project.owner.username }}</p>
+    <p>{{ project.description|default:"No description provided." }}</p>
+</section>
+{% endblock %}
