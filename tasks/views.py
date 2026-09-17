@@ -8,6 +8,7 @@ from projects.permissions import can_view_project
 
 from .forms import TaskForm
 from .models import Task
+from comments.forms import CommentForm
 
 
 @login_required
@@ -40,7 +41,7 @@ def task_detail(request, project_id, task_id):
     project = task.project
     if not can_view_project(request.user, project):
         raise PermissionDenied
-    return render(request, "tasks/task_detail.html", {"task": task})
+    return render(request, "tasks/task_detail.html", {"task": task, "comments": task.comments.select_related("author"), "comment_form": CommentForm()})
 
 
 @login_required

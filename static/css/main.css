@@ -68,6 +68,10 @@ label { display: block; font-weight: 650; margin-bottom: .4rem; }
 .task-details { display: grid; gap: .75rem 1rem; grid-template-columns: 120px 1fr; margin-top: 2rem; }
 .task-details dt { color: var(--muted); font-weight: 650; }
 .task-details dd { margin: 0; }
+.comment-list { margin-bottom: 1.5rem; }
+.comment { border-bottom: 1px solid var(--line); padding: 1rem 0; }
+.comment time { color: var(--muted); font-size: .85rem; }
+.comment p { margin-bottom: 0; white-space: pre-wrap; }
 .alert { border-radius: .5rem; padding: .75rem 1rem; }
 .alert-success { background: #e9f9ef; color: #176b36; }
 .alert-info { background: #eaf2ff; color: #174ea6; }
