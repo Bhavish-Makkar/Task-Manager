@@ -8,9 +8,7 @@ A multi-user task manager built with Django and MySQL for the Race Ai assignment
 
 ![TaskFlow data model, project permissions, dashboard and ORM overview](docs/taskflow-overview.svg)
 
-[Open the full-size diagram](docs/taskflow-overview.svg) · [Editable draw.io source](docs/taskflow-overview.drawio)
-
-To edit, open the `.drawio` file in diagrams.net. After editing, export it as SVG to update the README preview.
+[Open the full-size diagram](docs/taskflow-overview.svg)
 
 ## Features and access
 
