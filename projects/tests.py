@@ -107,7 +107,7 @@ class ProjectListAndDetailTests(TestCase):
     def test_non_owner_cannot_view_project_or_see_it_in_list(self):
         self.client.login(username="ravi", password=self.password)
 
-        self.assertEqual(self.client.get(f"/projects/{self.project.pk}/").status_code, 404)
+        self.assertEqual(self.client.get(f"/projects/{self.project.pk}/").status_code, 403)
         self.assertNotContains(self.client.get("/projects/"), "Website Redesign")
 
     def test_empty_project_list_has_empty_state(self):

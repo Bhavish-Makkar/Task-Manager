@@ -101,7 +101,7 @@ class TaskCreationTests(TestCase):
         self.client.login(username="aman", password=self.password)
         response = self.client.get(self.url)
         self.assertNotContains(response, 'name="project"')
-        self.client.post(self.url, {"title": "Safe task", "due_date": "2026-09-25", "project": "999"})
+        self.client.post(self.url, {"title": "Safe task", "status": "TODO", "priority": "MEDIUM", "due_date": "2026-09-25", "project": "999"})
         self.assertEqual(Task.objects.get(title="Safe task").project, self.project)
 
     def test_invalid_choice_does_not_create_task(self):
@@ -214,6 +214,17 @@ class TaskEditPermissionTests(TestCase):
         self.task.refresh_from_db()
         self.assertEqual(self.task.title, "Build homepage")
 
+    def test_mismatched_project_url_returns_not_found(self):
+        self.client.login(username="aman", password=self.password)
+        self.assertEqual(self.client.get(f"/projects/{self.other_project.pk}/tasks/{self.task.pk}/edit/").status_code, 404)
+
+    def test_invalid_choices_do_not_update_task(self):
+        self.client.login(username="aman", password=self.password)
+        response = self.client.post(self.url, {"title": "Changed", "status": "BAD", "priority": "BAD", "due_date": "2026-10-01"})
+        self.assertEqual(response.status_code, 200)
+        self.task.refresh_from_db()
+        self.assertEqual(self.task.title, "Build homepage")
+
 
 class TaskDeletePermissionTests(TestCase):
     def setUp(self):
@@ -254,16 +265,5 @@ class TaskDeletePermissionTests(TestCase):
     def test_mismatched_project_url_returns_not_found(self):
         self.client.login(username="aman", password=self.password)
         self.assertEqual(self.client.get(f"/projects/{self.other_project.pk}/tasks/{self.task.pk}/delete/").status_code, 404)
-
-    def test_mismatched_project_url_returns_not_found(self):
-        self.client.login(username="aman", password=self.password)
-        self.assertEqual(self.client.get(f"/projects/{self.other_project.pk}/tasks/{self.task.pk}/edit/").status_code, 404)
-
-    def test_invalid_choices_do_not_update_task(self):
-        self.client.login(username="aman", password=self.password)
-        response = self.client.post(self.url, {"title": "Changed", "status": "BAD", "priority": "BAD", "due_date": "2026-10-01"})
-        self.assertEqual(response.status_code, 200)
-        self.task.refresh_from_db()
-        self.assertEqual(self.task.title, "Build homepage")
 
 # Create your tests here.
