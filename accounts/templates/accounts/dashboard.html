@@ -6,6 +6,13 @@
     <title>Dashboard</title>
 </head>
 <body>
+    <nav>
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+        <form method="post" action="{% url 'logout' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
+    </nav>
     <h1>Welcome {{ user.username }}</h1>
     <p>You are logged in.</p>
 </body>

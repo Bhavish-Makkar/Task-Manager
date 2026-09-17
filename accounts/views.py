@@ -1,7 +1,8 @@
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect, render
 
 from .forms import RegistrationForm
@@ -41,5 +42,14 @@ def user_login(request):
 @login_required
 def dashboard(request):
     return render(request, "accounts/dashboard.html")
+
+
+def user_logout(request):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    logout(request)
+    messages.info(request, "You have been logged out successfully.")
+    return redirect("login")
 
 # Create your views here.
