@@ -1,4 +1,6 @@
 from django.contrib.auth import get_user_model
+from datetime import date
+
 from django.test import TestCase
 
 from projects.models import Project
@@ -143,5 +145,37 @@ class AuthenticationFlowTests(TestCase):
     def test_dashboard_is_protected(self):
         response = self.client.get("/dashboard/")
         self.assertRedirects(response, "/login/?next=/dashboard/")
+
+    def test_dashboard_groups_assigned_tasks_and_excludes_other_users(self):
+        user = User.objects.create_user(username="ravi", password=self.password)
+        other = User.objects.create_user(username="neha", password=self.password)
+        project = Project.objects.create(name="Dashboard Project", owner=other)
+        todo = Task.objects.create(title="Todo task", status=Task.Status.TODO, due_date=date(2026, 9, 20), project=project, assigned_to=user)
+        progress = Task.objects.create(title="Progress task", status=Task.Status.IN_PROGRESS, due_date=date(2026, 9, 21), project=project, assigned_to=user)
+        done = Task.objects.create(title="Done task", status=Task.Status.DONE, due_date=date(2026, 9, 10), project=project, assigned_to=user)
+        overdue = Task.objects.create(title="Overdue task", status=Task.Status.TODO, due_date=date(2026, 9, 15), project=project, assigned_to=user)
+        Task.objects.create(title="Other user's task", project=project, assigned_to=other, due_date=date(2026, 9, 14))
+        Task.objects.create(title="Unassigned task", project=project, due_date=date(2026, 9, 13))
+        self.client.login(username="ravi", password=self.password)
+
+        response = self.client.get("/dashboard/")
+
+        self.assertEqual(response.context["todo_tasks"], [overdue, todo])
+        self.assertEqual(response.context["in_progress_tasks"], [progress])
+        self.assertEqual(response.context["done_tasks"], [done])
+        self.assertEqual(response.context["overdue_tasks"], [overdue])
+        self.assertNotContains(response, "Other user's task")
+        self.assertNotContains(response, "Unassigned task")
+
+    def test_dashboard_has_all_three_empty_status_sections(self):
+        user = User.objects.create_user(username="ravi", password=self.password)
+        self.client.login(username="ravi", password=self.password)
+
+        response = self.client.get("/dashboard/")
+
+        self.assertContains(response, "No To Do tasks.")
+        self.assertContains(response, "No In Progress tasks.")
+        self.assertContains(response, "No completed tasks.")
+        self.assertContains(response, "No tasks assigned to you yet.")
 
 # Create your tests here.

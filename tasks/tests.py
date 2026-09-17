@@ -75,6 +75,17 @@ class TaskModelTests(TestCase):
 
         self.assertEqual(list(Task.objects.overdue(today=today)), [overdue_todo, overdue_progress])
 
+    def test_assigned_task_queryset_loads_forward_relations_in_one_query(self):
+        for index in range(20):
+            Task.objects.create(title=f"Task {index}", due_date=date(2026, 9, 25), project=self.project, assigned_to=self.assignee)
+
+        with self.assertNumQueries(1):
+            tasks = list(Task.objects.assigned_to_user(self.assignee).select_related("project", "assigned_to"))
+
+        self.assertEqual(len(tasks), 20)
+        self.assertEqual(tasks[0].project.name, "Website Redesign")
+        self.assertEqual(tasks[0].assigned_to.username, "ravi")
+
 
 class TaskCreationTests(TestCase):
     def setUp(self):
