@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <h1>Login</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <p>{{ form.non_field_errors }}</p>
+        {% endif %}
+        {{ form.username.errors }}
+        <p>
+            {{ form.username.label_tag }}
+            {{ form.username }}
+        </p>
+        {{ form.password.errors }}
+        <p>
+            {{ form.password.label_tag }}
+            {{ form.password }}
+        </p>
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+        <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
+</body>
+</html>
