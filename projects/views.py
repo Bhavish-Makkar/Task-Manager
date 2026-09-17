@@ -7,6 +7,8 @@ from django.db.models import Q
 from .forms import ProjectForm
 from .models import Project
 from .permissions import can_view_project
+from tasks.models import Task
+from tasks.querysets import status_counts_for_project
 
 
 @login_required
@@ -30,7 +32,9 @@ def project_detail(request, pk):
     if not can_view_project(request.user, project):
         raise PermissionDenied
     tasks = project.tasks.select_related("assigned_to").order_by("due_date")
-    return render(request, "projects/project_detail.html", {"project": project, "tasks": tasks})
+    raw_counts = {row["status"]: row["count"] for row in status_counts_for_project(project)}
+    status_counts = [(label, raw_counts.get(value, 0)) for value, label in Task.Status.choices]
+    return render(request, "projects/project_detail.html", {"project": project, "tasks": tasks, "status_counts": status_counts})
 
 
 @login_required

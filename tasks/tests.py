@@ -86,6 +86,16 @@ class TaskModelTests(TestCase):
         self.assertEqual(tasks[0].project.name, "Website Redesign")
         self.assertEqual(tasks[0].assigned_to.username, "ravi")
 
+    def test_status_counts_are_grouped_by_database(self):
+        from .querysets import status_counts_for_project
+        for index in range(2):
+            Task.objects.create(title=f"Todo {index}", status=Task.Status.TODO, due_date=date(2026, 9, 25), project=self.project)
+        Task.objects.create(title="Progress", status=Task.Status.IN_PROGRESS, due_date=date(2026, 9, 25), project=self.project)
+        for index in range(3):
+            Task.objects.create(title=f"Done {index}", status=Task.Status.DONE, due_date=date(2026, 9, 25), project=self.project)
+        counts = {row["status"]: row["count"] for row in status_counts_for_project(self.project)}
+        self.assertEqual(counts, {Task.Status.TODO: 2, Task.Status.IN_PROGRESS: 1, Task.Status.DONE: 3})
+
 
 class TaskCreationTests(TestCase):
     def setUp(self):

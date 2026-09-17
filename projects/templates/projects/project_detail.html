@@ -6,6 +6,7 @@
     <h1>{{ project.name }}</h1>
     <p class="helper">Owned by {{ project.owner.username }}</p>
     <p>{{ project.description|default:"No description provided." }}</p>
+    <div class="status-summary">{% for label, count in status_counts %}<div><span>{{ label }}</span><strong>{{ count }}</strong></div>{% endfor %}</div>
     <div class="project-actions">
         {% if user == project.owner %}<a class="btn btn-primary" href="{% url 'project_edit' project.pk %}">Edit project</a>{% endif %}
         {% if user == project.owner %}<a class="btn btn-danger" href="{% url 'project_delete' project.pk %}">Delete project</a>{% endif %}

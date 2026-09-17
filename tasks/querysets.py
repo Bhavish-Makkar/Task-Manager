@@ -1,4 +1,5 @@
 from .models import Task
+from django.db.models import Count
 
 
 def assigned_tasks_for(user):
@@ -24,3 +25,7 @@ def group_tasks_by_status(tasks):
     for task in tasks:
         groups.setdefault(task.status, []).append(task)
     return groups
+
+
+def status_counts_for_project(project):
+    return Task.objects.filter(project=project).values("status").annotate(count=Count("id")).order_by("status")

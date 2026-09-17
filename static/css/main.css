@@ -90,6 +90,11 @@ label { display: block; font-weight: 650; margin-bottom: .4rem; }
 .task-details { display: grid; gap: .75rem 1rem; grid-template-columns: 120px 1fr; margin-top: 2rem; }
 .task-details dt { color: var(--muted); font-weight: 650; }
 .task-details dd { margin: 0; }
+.status-summary { display: grid; gap: .75rem; grid-template-columns: repeat(3, 1fr); margin: 1.5rem 0; }
+.status-summary div { background: #f5f7fb; border: 1px solid var(--line); border-radius: .6rem; padding: .75rem; }
+.status-summary span, .status-summary strong { display: block; }
+.status-summary span { color: var(--muted); font-size: .85rem; }
+.status-summary strong { font-size: 1.5rem; }
 .comment-list { margin-bottom: 1.5rem; }
 .comment { align-items: flex-start; border-bottom: 1px solid var(--line); display: flex; gap: .75rem; padding: 1rem 0; }
 .avatar { align-items: center; background: #e8e7ff; border-radius: 50%; color: var(--accent-dark); display: flex; flex: 0 0 2rem; font-weight: 800; height: 2rem; justify-content: center; }
