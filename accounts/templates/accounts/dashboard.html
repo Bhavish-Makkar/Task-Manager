@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Dashboard · TaskFlow{% endblock %}
 {% block content %}
-<section class="dashboard-card"><div class="eyebrow">Your workspace</div><h1>Welcome back, {{ user.username }}</h1><p class="helper">Your assigned work, organized by status.</p></section>
+<section class="dashboard-header"><div><div class="eyebrow">Your workspace</div><h1>My Tasks</h1><p class="helper">Welcome back, {{ user.username }}. Track your assigned work across projects.</p></div><a class="nav-register" href="{% url 'project_list' %}">View projects</a></section>
+<section class="stats-row"><div class="stat-card"><span>My tasks</span><strong>{{ tasks|length }}</strong></div><div class="stat-card stat-danger"><span>Overdue</span><strong>{{ overdue_tasks|length }}</strong></div></section>
+{% if not tasks %}<section class="dashboard-card empty-dashboard"><h2>No tasks assigned to you yet.</h2><p class="helper">Tasks assigned to you will appear here.</p></section>{% endif %}
 <section class="overdue-section"><div class="section-heading"><h2>Overdue <span class="overdue-count">{{ overdue_tasks|length }}</span></h2></div>{% if overdue_tasks %}{% for task in overdue_tasks %}<a class="dashboard-task overdue-task" href="{% url 'task_detail' task.project.pk task.pk %}"><strong>{{ task.title }}</strong><small>{{ task.project.name }} · Due {{ task.due_date|date:"d M Y" }}</small><b>OVERDUE</b></a>{% endfor %}{% else %}<p class="helper">No overdue tasks.</p>{% endif %}</section>
 <section class="dashboard-board">
 <div class="task-column"><div class="column-heading"><h2>To Do</h2><span>{{ todo_tasks|length }}</span></div>{% for task in todo_tasks %}<a class="dashboard-task" href="{% url 'task_detail' task.project.pk task.pk %}"><strong>{{ task.title }}</strong><small>{{ task.project.name }}</small><small>{{ task.get_priority_display }} · Due {{ task.due_date|date:"d M Y" }}</small></a>{% empty %}<p class="helper">No To Do tasks.</p>{% endfor %}</div>
