@@ -10,7 +10,11 @@
         {% if user == project.owner %}<a class="btn btn-primary" href="{% url 'project_edit' project.pk %}">Edit project</a>{% endif %}
         {% if user == project.owner %}<a class="btn btn-danger" href="{% url 'project_delete' project.pk %}">Delete project</a>{% endif %}
     </div>
-    <h2>Tasks</h2>
-    <p class="helper">No tasks yet.</p>
+    <div class="section-heading"><h2>Tasks</h2>{% if user == project.owner %}<a class="nav-register" href="{% url 'task_create' project.pk %}">Add task</a>{% endif %}</div>
+    {% if tasks %}
+        <div class="task-list">
+            {% for task in tasks %}<div class="task-row"><strong>{{ task.title }}</strong><span>{{ task.get_status_display }} · {{ task.get_priority_display }} · Due {{ task.due_date }}</span>{% if task.assigned_to %}<small>Assigned to {{ task.assigned_to.username }}</small>{% else %}<small>Unassigned</small>{% endif %}</div>{% endfor %}
+        </div>
+    {% else %}<p class="helper">No tasks yet.</p>{% endif %}
 </section>
 {% endblock %}

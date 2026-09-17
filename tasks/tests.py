@@ -65,4 +65,49 @@ class TaskModelTests(TestCase):
 
         self.assertIsNone(task.assigned_to)
 
+
+class TaskCreationTests(TestCase):
+    def setUp(self):
+        self.password = "StrongPassword123!"
+        self.owner = User.objects.create_user(username="aman", password=self.password)
+        self.assignee = User.objects.create_user(username="ravi", password=self.password)
+        self.project = Project.objects.create(name="Website Redesign", owner=self.owner)
+        self.url = f"/projects/{self.project.pk}/tasks/create/"
+
+    def test_anonymous_user_is_redirected_to_login(self):
+        self.assertRedirects(self.client.get(self.url), f"/login/?next={self.url}")
+
+    def test_owner_can_create_assigned_task_for_project(self):
+        self.client.login(username="aman", password=self.password)
+        response = self.client.post(self.url, {"title": "Build homepage", "status": "TODO", "priority": "HIGH", "due_date": "2026-09-25", "assigned_to": self.assignee.pk})
+
+        task = Task.objects.get(title="Build homepage")
+        self.assertRedirects(response, f"/projects/{self.project.pk}/")
+        self.assertEqual(task.project, self.project)
+        self.assertEqual(task.assigned_to, self.assignee)
+
+    def test_unassigned_task_is_allowed(self):
+        self.client.login(username="aman", password=self.password)
+        self.client.post(self.url, {"title": "Create schema", "status": "TODO", "priority": "MEDIUM", "due_date": "2026-09-25", "assigned_to": ""})
+        self.assertIsNone(Task.objects.get(title="Create schema").assigned_to)
+
+    def test_non_owner_cannot_create_task(self):
+        self.client.login(username="ravi", password=self.password)
+        response = self.client.post(self.url, {"title": "Unauthorized", "due_date": "2026-09-25"})
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(Task.objects.filter(title="Unauthorized").exists())
+
+    def test_project_is_not_a_form_field_and_posted_project_is_ignored(self):
+        self.client.login(username="aman", password=self.password)
+        response = self.client.get(self.url)
+        self.assertNotContains(response, 'name="project"')
+        self.client.post(self.url, {"title": "Safe task", "due_date": "2026-09-25", "project": "999"})
+        self.assertEqual(Task.objects.get(title="Safe task").project, self.project)
+
+    def test_invalid_choice_does_not_create_task(self):
+        self.client.login(username="aman", password=self.password)
+        response = self.client.post(self.url, {"title": "Invalid", "status": "INVALID", "priority": "INVALID", "due_date": "2026-09-25"})
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Task.objects.filter(title="Invalid").exists())
+
 # Create your tests here.
