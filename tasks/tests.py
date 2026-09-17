@@ -110,4 +110,40 @@ class TaskCreationTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Task.objects.filter(title="Invalid").exists())
 
+
+class TaskVisibilityTests(TestCase):
+    def setUp(self):
+        self.password = "StrongPassword123!"
+        self.owner = User.objects.create_user(username="aman", password=self.password)
+        self.assignee = User.objects.create_user(username="ravi", password=self.password)
+        self.unrelated = User.objects.create_user(username="raj", password=self.password)
+        self.project = Project.objects.create(name="Website Redesign", owner=self.owner)
+        self.task = Task.objects.create(
+            title="Build homepage", due_date=date(2026, 9, 25), project=self.project, assigned_to=self.assignee
+        )
+
+    def test_assigned_member_can_view_all_project_tasks_and_task_detail(self):
+        self.client.login(username="ravi", password=self.password)
+        project_response = self.client.get(f"/projects/{self.project.pk}/")
+        task_response = self.client.get(f"/projects/{self.project.pk}/tasks/{self.task.pk}/")
+        self.assertEqual(project_response.status_code, 200)
+        self.assertContains(project_response, "Build homepage")
+        self.assertEqual(task_response.status_code, 200)
+
+    def test_unrelated_user_cannot_view_project_or_task(self):
+        self.client.login(username="raj", password=self.password)
+        self.assertEqual(self.client.get(f"/projects/{self.project.pk}/").status_code, 403)
+        self.assertEqual(self.client.get(f"/projects/{self.project.pk}/tasks/{self.task.pk}/").status_code, 403)
+
+    def test_task_detail_requires_matching_project_id(self):
+        other_project = Project.objects.create(name="Other Project", owner=self.owner)
+        self.client.login(username="aman", password=self.password)
+        self.assertEqual(self.client.get(f"/projects/{other_project.pk}/tasks/{self.task.pk}/").status_code, 404)
+
+    def test_anonymous_user_is_redirected_to_login(self):
+        self.assertRedirects(
+            self.client.get(f"/projects/{self.project.pk}/tasks/{self.task.pk}/"),
+            f"/login/?next=/projects/{self.project.pk}/tasks/{self.task.pk}/",
+        )
+
 # Create your tests here.

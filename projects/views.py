@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
+from django.db.models import Q
 
 from .forms import ProjectForm
 from .models import Project
@@ -24,8 +25,11 @@ def project_create(request):
 
 @login_required
 def project_detail(request, pk):
-    project = get_object_or_404(Project, pk=pk, owner=request.user)
-    return render(request, "projects/project_detail.html", {"project": project, "tasks": project.tasks.select_related("assigned_to")})
+    project = get_object_or_404(Project, pk=pk)
+    if project.owner_id != request.user.id and not project.tasks.filter(assigned_to=request.user).exists():
+        raise PermissionDenied
+    tasks = project.tasks.select_related("assigned_to").order_by("due_date")
+    return render(request, "projects/project_detail.html", {"project": project, "tasks": tasks})
 
 
 @login_required
@@ -61,7 +65,9 @@ def project_delete(request, pk):
 
 @login_required
 def project_list(request):
-    projects = Project.objects.filter(owner=request.user).select_related("owner")
+    projects = Project.objects.filter(
+        Q(owner=request.user) | Q(tasks__assigned_to=request.user)
+    ).select_related("owner").distinct()
     return render(request, "projects/project_list.html", {"projects": projects})
 
 # Create your views here.

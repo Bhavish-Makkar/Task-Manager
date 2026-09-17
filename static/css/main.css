@@ -56,6 +56,9 @@ label { display: block; font-weight: 650; margin-bottom: .4rem; }
 .task-list { border-top: 1px solid var(--line); }
 .task-row { border-bottom: 1px solid var(--line); display: grid; gap: .25rem; padding: 1rem 0; }
 .task-row span, .task-row small { color: var(--muted); }
+.task-details { display: grid; gap: .75rem 1rem; grid-template-columns: 120px 1fr; margin-top: 2rem; }
+.task-details dt { color: var(--muted); font-weight: 650; }
+.task-details dd { margin: 0; }
 .alert { border-radius: .5rem; padding: .75rem 1rem; }
 .alert-success { background: #e9f9ef; color: #176b36; }
 .alert-info { background: #eaf2ff; color: #174ea6; }
