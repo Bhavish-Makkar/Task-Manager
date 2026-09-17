@@ -184,6 +184,47 @@ class TaskEditPermissionTests(TestCase):
         self.task.refresh_from_db()
         self.assertEqual(self.task.title, "Build homepage")
 
+
+class TaskDeletePermissionTests(TestCase):
+    def setUp(self):
+        self.password = "StrongPassword123!"
+        self.owner = User.objects.create_user(username="aman", password=self.password)
+        self.assignee = User.objects.create_user(username="ravi", password=self.password)
+        self.other_user = User.objects.create_user(username="raj", password=self.password)
+        self.project = Project.objects.create(name="Website Redesign", owner=self.owner)
+        self.other_project = Project.objects.create(name="Other Project", owner=self.owner)
+        self.task = Task.objects.create(title="Build homepage", due_date=date(2026, 9, 25), project=self.project, assigned_to=self.assignee)
+        self.url = f"/projects/{self.project.pk}/tasks/{self.task.pk}/delete/"
+
+    def test_anonymous_user_is_redirected_to_login(self):
+        self.assertRedirects(self.client.get(self.url), f"/login/?next={self.url}")
+
+    def test_owner_can_view_confirmation_without_deleting(self):
+        self.client.login(username="aman", password=self.password)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "This action cannot be undone.")
+        self.assertTrue(Task.objects.filter(pk=self.task.pk).exists())
+
+    def test_owner_can_delete_task_with_post(self):
+        self.client.login(username="aman", password=self.password)
+        response = self.client.post(self.url)
+        self.assertRedirects(response, f"/projects/{self.project.pk}/")
+        self.assertFalse(Task.objects.filter(pk=self.task.pk).exists())
+        self.assertTrue(Project.objects.filter(pk=self.project.pk).exists())
+
+    def test_assignee_and_unrelated_user_cannot_delete(self):
+        for username in ("ravi", "raj"):
+            self.client.login(username=username, password=self.password)
+            self.assertEqual(self.client.get(self.url).status_code, 403)
+            self.assertEqual(self.client.post(self.url).status_code, 403)
+            self.client.logout()
+        self.assertTrue(Task.objects.filter(pk=self.task.pk).exists())
+
+    def test_mismatched_project_url_returns_not_found(self):
+        self.client.login(username="aman", password=self.password)
+        self.assertEqual(self.client.get(f"/projects/{self.other_project.pk}/tasks/{self.task.pk}/delete/").status_code, 404)
+
     def test_mismatched_project_url_returns_not_found(self):
         self.client.login(username="aman", password=self.password)
         self.assertEqual(self.client.get(f"/projects/{self.other_project.pk}/tasks/{self.task.pk}/edit/").status_code, 404)

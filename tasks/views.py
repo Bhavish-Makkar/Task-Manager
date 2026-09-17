@@ -63,4 +63,22 @@ def task_edit(request, project_id, task_id):
 
     return render(request, "tasks/task_form.html", {"form": form, "project": task.project, "task": task})
 
+
+@login_required
+def task_delete(request, project_id, task_id):
+    task = get_object_or_404(
+        Task.objects.select_related("project"),
+        pk=task_id,
+        project_id=project_id,
+    )
+    if task.project.owner_id != request.user.id:
+        raise PermissionDenied
+
+    if request.method == "POST":
+        task.delete()
+        messages.success(request, "Task deleted successfully.")
+        return redirect("project_detail", pk=project_id)
+
+    return render(request, "tasks/task_confirm_delete.html", {"task": task})
+
 # Create your views here.
