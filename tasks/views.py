@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 
 from projects.models import Project
+from projects.permissions import can_view_project
 
 from .forms import TaskForm
 from .models import Task
@@ -37,7 +38,7 @@ def task_detail(request, project_id, task_id):
         project_id=project_id,
     )
     project = task.project
-    if project.owner_id != request.user.id and not project.tasks.filter(assigned_to=request.user).exists():
+    if not can_view_project(request.user, project):
         raise PermissionDenied
     return render(request, "tasks/task_detail.html", {"task": task})
 

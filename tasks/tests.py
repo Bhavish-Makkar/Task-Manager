@@ -130,6 +130,36 @@ class TaskVisibilityTests(TestCase):
         self.assertContains(project_response, "Build homepage")
         self.assertEqual(task_response.status_code, 200)
 
+    def test_assignee_project_list_has_no_duplicate_projects(self):
+        Task.objects.create(title="Second task", due_date=date(2026, 9, 26), project=self.project, assigned_to=self.assignee)
+        self.client.login(username="ravi", password=self.password)
+
+        response = self.client.get("/projects/")
+
+        self.assertEqual(list(response.context["projects"]), [self.project])
+
+    def test_reassignment_removes_membership_when_no_assignment_remains(self):
+        self.task.assigned_to = self.owner
+        self.task.save(update_fields=["assigned_to"])
+        self.client.login(username="ravi", password=self.password)
+
+        self.assertEqual(self.client.get(f"/projects/{self.project.pk}/").status_code, 403)
+        self.assertEqual(self.client.get(f"/projects/{self.project.pk}/tasks/{self.task.pk}/").status_code, 403)
+
+    def test_unassigned_task_does_not_create_membership(self):
+        self.task.assigned_to = None
+        self.task.save(update_fields=["assigned_to"])
+        self.client.login(username="raj", password=self.password)
+
+        self.assertEqual(self.client.get(f"/projects/{self.project.pk}/").status_code, 403)
+
+    def test_assigned_member_is_view_only_for_project_and_task_writes(self):
+        self.client.login(username="ravi", password=self.password)
+        self.assertEqual(self.client.get(f"/projects/{self.project.pk}/edit/").status_code, 403)
+        self.assertEqual(self.client.post(f"/projects/{self.project.pk}/delete/").status_code, 403)
+        self.assertEqual(self.client.get(f"/projects/{self.project.pk}/tasks/{self.task.pk}/edit/").status_code, 403)
+        self.assertEqual(self.client.post(f"/projects/{self.project.pk}/tasks/{self.task.pk}/delete/").status_code, 403)
+
     def test_unrelated_user_cannot_view_project_or_task(self):
         self.client.login(username="raj", password=self.password)
         self.assertEqual(self.client.get(f"/projects/{self.project.pk}/").status_code, 403)

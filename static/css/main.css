@@ -57,6 +57,14 @@ label { display: block; font-weight: 650; margin-bottom: .4rem; }
 .task-list { border-top: 1px solid var(--line); }
 .task-row { border-bottom: 1px solid var(--line); display: grid; gap: .25rem; padding: 1rem 0; }
 .task-row span, .task-row small { color: var(--muted); }
+.task-actions { color: var(--accent) !important; }
+.badge { border-radius: 999px; display: inline-block; font-size: .75rem; margin-right: .35rem; padding: .2rem .55rem; }
+.status-todo { background: #eef0f6; color: #4b5568; }
+.status-in_progress { background: #fff4d6; color: #8a5a00; }
+.status-done { background: #e9f9ef; color: #176b36; }
+.priority-low { background: #eef0f6; color: #4b5568; }
+.priority-medium { background: #eaf2ff; color: #174ea6; }
+.priority-high { background: #fff0ef; color: var(--danger); }
 .task-details { display: grid; gap: .75rem 1rem; grid-template-columns: 120px 1fr; margin-top: 2rem; }
 .task-details dt { color: var(--muted); font-weight: 650; }
 .task-details dd { margin: 0; }

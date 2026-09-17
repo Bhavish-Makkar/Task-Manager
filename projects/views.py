@@ -6,6 +6,7 @@ from django.db.models import Q
 
 from .forms import ProjectForm
 from .models import Project
+from .permissions import can_view_project
 
 
 @login_required
@@ -26,7 +27,7 @@ def project_create(request):
 @login_required
 def project_detail(request, pk):
     project = get_object_or_404(Project, pk=pk)
-    if project.owner_id != request.user.id and not project.tasks.filter(assigned_to=request.user).exists():
+    if not can_view_project(request.user, project):
         raise PermissionDenied
     tasks = project.tasks.select_related("assigned_to").order_by("due_date")
     return render(request, "projects/project_detail.html", {"project": project, "tasks": tasks})

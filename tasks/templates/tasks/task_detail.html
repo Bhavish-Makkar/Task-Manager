@@ -6,9 +6,9 @@
     <h1>{{ task.title }}</h1>
     <dl class="task-details">
         <dt>Project</dt><dd><a href="{% url 'project_detail' task.project.pk %}">{{ task.project.name }}</a></dd>
-        <dt>Status</dt><dd>{{ task.get_status_display }}</dd>
-        <dt>Priority</dt><dd>{{ task.get_priority_display }}</dd>
-        <dt>Due date</dt><dd>{{ task.due_date }}</dd>
+        <dt>Status</dt><dd><b class="badge status-{{ task.status|lower }}">{{ task.get_status_display }}</b></dd>
+        <dt>Priority</dt><dd><b class="badge priority-{{ task.priority|lower }}">{{ task.get_priority_display }}</b></dd>
+        <dt>Due date</dt><dd>{{ task.due_date|date:"d M Y" }}</dd>
         <dt>Assigned to</dt><dd>{% if task.assigned_to %}{{ task.assigned_to.username }}{% else %}Unassigned{% endif %}</dd>
     </dl>
     {% if user == task.project.owner %}<div class="project-actions"><a class="btn btn-primary" href="{% url 'task_edit' task.project.pk task.pk %}">Edit task</a><a class="btn btn-danger" href="{% url 'task_delete' task.project.pk task.pk %}">Delete task</a></div>{% endif %}
