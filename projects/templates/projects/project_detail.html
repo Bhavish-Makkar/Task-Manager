@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ project.name }} · TaskFlow{% endblock %}
+{% block content %}
+<section class="dashboard-card">
+    <div class="eyebrow">Project</div>
+    <h1>{{ project.name }}</h1>
+    <p class="helper">Owned by {{ project.owner.username }}</p>
+    <p>{{ project.description|default:"No description provided." }}</p>
+    <div class="status-summary">{% for label, count in status_counts %}<div><span>{{ label }}</span><strong>{{ count }}</strong></div>{% endfor %}</div>
+    <div class="project-actions">
+        {% if user == project.owner %}<a class="btn btn-primary" href="{% url 'project_edit' project.pk %}">Edit project</a>{% endif %}
+        {% if user == project.owner %}<a class="btn btn-danger" href="{% url 'project_delete' project.pk %}">Delete project</a>{% endif %}
+    </div>
+    <div class="section-heading"><h2>Tasks</h2>{% if user == project.owner %}<a class="nav-register" href="{% url 'task_create' project.pk %}">Add task</a>{% endif %}</div>
+    {% if tasks %}
+        <div class="task-list">
+            {% for task in tasks %}<div class="task-row"><strong>{{ task.title }}</strong><span><b class="badge status-{{ task.status|lower }}">{{ task.get_status_display }}</b><b class="badge priority-{{ task.priority|lower }}">{{ task.get_priority_display }}</b></span><small>Due: {{ task.due_date|date:"d M Y" }} · {% if task.assigned_to %}Assigned: {{ task.assigned_to.username }}{% else %}Unassigned{% endif %}</small><span class="task-actions"><a href="{% url 'task_detail' project.pk task.pk %}">View</a>{% if user == project.owner %} · <a href="{% url 'task_edit' project.pk task.pk %}">Edit</a> · <a href="{% url 'task_delete' project.pk task.pk %}">Delete</a>{% endif %}</span></div>{% endfor %}
+        </div>
+    {% else %}<p class="helper">No tasks yet. This project doesn't have any tasks.</p>{% endif %}
+</section>
+{% endblock %}
