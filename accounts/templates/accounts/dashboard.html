@@ -5,6 +5,6 @@
     <div class="eyebrow">Your workspace</div>
     <h1>Welcome back, {{ user.username }}</h1>
     <p class="helper">Your workspace is ready.</p>
-    <p>Projects and tasks will appear here.</p>
+    {% if tasks %}<p>{{ tasks|length }} assigned task{{ tasks|length|pluralize }}.</p>{% else %}<p>Projects and tasks will appear here.</p>{% endif %}
 </section>
 {% endblock %}

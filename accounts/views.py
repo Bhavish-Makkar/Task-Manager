@@ -6,6 +6,7 @@ from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect, render
 
 from .forms import RegistrationForm
+from tasks.querysets import assigned_tasks_for
 
 
 def register(request):
@@ -43,7 +44,7 @@ def user_login(request):
 
 @login_required
 def dashboard(request):
-    return render(request, "accounts/dashboard.html")
+    return render(request, "accounts/dashboard.html", {"tasks": assigned_tasks_for(request.user)})
 
 
 def user_logout(request):

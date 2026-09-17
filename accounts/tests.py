@@ -1,6 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
+from projects.models import Project
+from tasks.models import Task
+
 
 User = get_user_model()
 
@@ -123,5 +126,22 @@ class AuthenticationFlowTests(TestCase):
 
     def test_get_logout_is_not_allowed(self):
         self.assertEqual(self.client.get("/logout/").status_code, 405)
+
+    def test_dashboard_contains_only_tasks_assigned_to_current_user(self):
+        owner = User.objects.create_user(username="owner", password=self.password)
+        other = User.objects.create_user(username="other", password=self.password)
+        project = Project.objects.create(name="Dashboard Project", owner=owner)
+        assigned = Task.objects.create(title="Assigned task", due_date="2026-09-20", project=project, assigned_to=owner)
+        Task.objects.create(title="Other task", due_date="2026-09-19", project=project, assigned_to=other)
+        Task.objects.create(title="Unassigned task", due_date="2026-09-18", project=project)
+        self.client.login(username="owner", password=self.password)
+
+        response = self.client.get("/dashboard/")
+
+        self.assertEqual(list(response.context["tasks"]), [assigned])
+
+    def test_dashboard_is_protected(self):
+        response = self.client.get("/dashboard/")
+        self.assertRedirects(response, "/login/?next=/dashboard/")
 
 # Create your tests here.
