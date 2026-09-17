@@ -38,6 +38,15 @@ label { display: block; font-weight: 650; margin-bottom: .4rem; }
 .btn-primary:hover { background: var(--accent-dark); }
 .form-footer { margin: 1.25rem 0 0; text-align: center; }
 .message-stack { margin: 1rem auto; max-width: 720px; padding: 0 1rem; }
+.section-heading { align-items: center; display: flex; justify-content: space-between; margin-bottom: 2rem; }
+.project-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.project-card { background: var(--surface); border: 1px solid var(--line); border-radius: 1rem; box-shadow: 0 10px 30px #1720330a; display: flex; flex-direction: column; padding: 1.4rem; }
+.project-card h2 { margin-top: 0; }
+.project-card .btn { margin-top: auto; text-align: center; }
+.project-actions { display: flex; gap: .75rem; margin: 2rem 0; }
+.btn-secondary { background: #eef0f6; color: var(--muted); }
+.empty-state { text-align: center; }
+.empty-state .btn { display: inline-block; max-width: 220px; }
 .alert { border-radius: .5rem; padding: .75rem 1rem; }
 .alert-success { background: #e9f9ef; color: #176b36; }
 .alert-info { background: #eaf2ff; color: #174ea6; }

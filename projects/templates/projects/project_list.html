@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}My Projects · TaskFlow{% endblock %}
+{% block content %}
+<div class="section-heading">
+    <div><div class="eyebrow">Workspace</div><h1>My Projects</h1></div>
+    <a class="nav-register" href="{% url 'project_create' %}">Create project</a>
+</div>
+{% if projects %}
+    <div class="project-grid">
+        {% for project in projects %}
+            <article class="project-card">
+                <h2>{{ project.name }}</h2>
+                <p>{{ project.description|default:"No description provided."|truncatewords:20 }}</p>
+                <p class="helper">Owner: {{ project.owner.username }}</p>
+                <a class="btn btn-primary" href="{% url 'project_detail' project.pk %}">View project</a>
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <section class="dashboard-card empty-state">
+        <h2>No projects yet</h2>
+        <p class="helper">Create your first project to get started.</p>
+        <a class="btn btn-primary" href="{% url 'project_create' %}">Create project</a>
+    </section>
+{% endif %}
+{% endblock %}

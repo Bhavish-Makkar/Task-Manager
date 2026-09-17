@@ -22,7 +22,13 @@ def project_create(request):
 
 @login_required
 def project_detail(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, pk=pk, owner=request.user)
     return render(request, "projects/project_detail.html", {"project": project})
+
+
+@login_required
+def project_list(request):
+    projects = Project.objects.filter(owner=request.user).select_related("owner")
+    return render(request, "projects/project_list.html", {"projects": projects})
 
 # Create your views here.

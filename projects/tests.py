@@ -65,4 +65,48 @@ class ProjectCreationTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Project.objects.filter(description="Details").exists())
 
+
+class ProjectListAndDetailTests(TestCase):
+    def setUp(self):
+        self.password = "StrongPassword123!"
+        self.owner = User.objects.create_user(username="aman", password=self.password)
+        self.other_user = User.objects.create_user(username="ravi", password=self.password)
+        self.project = Project.objects.create(name="Website Redesign", owner=self.owner)
+
+    def test_anonymous_user_cannot_view_list_or_detail(self):
+        self.assertRedirects(self.client.get("/projects/"), "/login/?next=/projects/")
+        self.assertRedirects(
+            self.client.get(f"/projects/{self.project.pk}/"),
+            f"/login/?next=/projects/{self.project.pk}/",
+        )
+
+    def test_owner_sees_owned_projects_in_list(self):
+        self.client.login(username="aman", password=self.password)
+
+        response = self.client.get("/projects/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Website Redesign")
+
+    def test_owner_can_view_project_detail(self):
+        self.client.login(username="aman", password=self.password)
+
+        response = self.client.get(f"/projects/{self.project.pk}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Edit project")
+
+    def test_non_owner_cannot_view_project_or_see_it_in_list(self):
+        self.client.login(username="ravi", password=self.password)
+
+        self.assertEqual(self.client.get(f"/projects/{self.project.pk}/").status_code, 404)
+        self.assertNotContains(self.client.get("/projects/"), "Website Redesign")
+
+    def test_empty_project_list_has_empty_state(self):
+        self.client.login(username="ravi", password=self.password)
+
+        response = self.client.get("/projects/")
+
+        self.assertContains(response, "No projects yet")
+
 # Create your tests here.
