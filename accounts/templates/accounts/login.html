@@ -1,30 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-</head>
-<body>
-    <h1>Login</h1>
+{% extends "base.html" %}
+{% block title %}Sign in · TaskFlow{% endblock %}
+{% block content %}
+<section class="auth-card">
+    <div class="eyebrow">TaskFlow</div>
+    <h1>Welcome back</h1>
+    <p class="helper">Sign in to continue to your workspace.</p>
     <form method="post">
         {% csrf_token %}
-        {% if form.non_field_errors %}
-            <p>{{ form.non_field_errors }}</p>
-        {% endif %}
-        {{ form.username.errors }}
-        <p>
-            {{ form.username.label_tag }}
-            {{ form.username }}
-        </p>
-        {{ form.password.errors }}
-        <p>
-            {{ form.password.label_tag }}
-            {{ form.password }}
-        </p>
+        {% if form.non_field_errors %}<p class="form-error">Invalid username or password.</p>{% endif %}
+        <div class="form-group">{{ form.username.label_tag }}{{ form.username }}{% for error in form.username.errors %}<p class="form-error">{{ error }}</p>{% endfor %}</div>
+        <div class="form-group">{{ form.password.label_tag }}{{ form.password }}{% for error in form.password.errors %}<p class="form-error">{{ error }}</p>{% endfor %}</div>
         <input type="hidden" name="next" value="{{ request.GET.next }}">
-        <button type="submit">Login</button>
+        <button class="btn btn-primary" type="submit">Sign in</button>
     </form>
-    <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
-</body>
-</html>
+    <p class="form-footer">Don't have an account? <a href="{% url 'register' %}">Create one</a></p>
+</section>
+{% endblock %}

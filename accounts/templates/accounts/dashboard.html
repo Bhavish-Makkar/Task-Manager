@@ -1,19 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-</head>
-<body>
-    <nav>
-        <a href="{% url 'dashboard' %}">Dashboard</a>
-        <form method="post" action="{% url 'logout' %}" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit">Logout</button>
-        </form>
-    </nav>
-    <h1>Welcome {{ user.username }}</h1>
-    <p>You are logged in.</p>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Dashboard · TaskFlow{% endblock %}
+{% block content %}
+<section class="dashboard-card">
+    <div class="eyebrow">Your workspace</div>
+    <h1>Welcome back, {{ user.username }}</h1>
+    <p class="helper">Your workspace is ready.</p>
+    <p>Projects and tasks will appear here.</p>
+</section>
+{% endblock %}

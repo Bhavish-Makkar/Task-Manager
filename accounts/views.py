@@ -26,6 +26,8 @@ def user_login(request):
         return redirect("dashboard")
 
     form = AuthenticationForm(request, data=request.POST or None)
+    for field in form.fields.values():
+        field.widget.attrs["class"] = "form-control"
     if request.method == "POST" and form.is_valid():
         user = authenticate(
             request,
