@@ -45,6 +45,9 @@ label { display: block; font-weight: 650; margin-bottom: .4rem; }
 .project-card .btn { margin-top: auto; text-align: center; }
 .project-actions { display: flex; gap: .75rem; margin: 2rem 0; }
 .btn-secondary { background: #eef0f6; color: var(--muted); }
+.btn-danger { background: #c92a2a; color: #fff; }
+.btn-danger:hover { background: #a61e1e; text-decoration: none; }
+.project-actions form { margin: 0; }
 .empty-state { text-align: center; }
 .empty-state .btn { display: inline-block; max-width: 220px; }
 .alert { border-radius: .5rem; padding: .75rem 1rem; }

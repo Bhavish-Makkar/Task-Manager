@@ -7,8 +7,8 @@
     <p class="helper">Owned by {{ project.owner.username }}</p>
     <p>{{ project.description|default:"No description provided." }}</p>
     <div class="project-actions">
-        <button class="btn btn-secondary" type="button" disabled>Edit project</button>
-        <button class="btn btn-secondary" type="button" disabled>Delete project</button>
+        {% if user == project.owner %}<a class="btn btn-primary" href="{% url 'project_edit' project.pk %}">Edit project</a>{% endif %}
+        {% if user == project.owner %}<a class="btn btn-danger" href="{% url 'project_delete' project.pk %}">Delete project</a>{% endif %}
     </div>
     <h2>Tasks</h2>
     <p class="helper">No tasks yet.</p>

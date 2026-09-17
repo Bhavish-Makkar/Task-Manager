@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Delete {{ project.name }} · TaskFlow{% endblock %}
+{% block content %}
+<section class="auth-card">
+    <div class="eyebrow">Danger zone</div>
+    <h1>Delete project</h1>
+    <p>Are you sure you want to delete <strong>“{{ project.name }}”</strong>?</p>
+    <p class="helper">This action cannot be undone.</p>
+    <div class="project-actions">
+        <a class="btn btn-secondary" href="{% url 'project_detail' project.pk %}">Cancel</a>
+        <form method="post" action="{% url 'project_delete' project.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-danger" type="submit">Delete project</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

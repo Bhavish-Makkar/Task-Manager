@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import ProjectForm
@@ -24,6 +25,37 @@ def project_create(request):
 def project_detail(request, pk):
     project = get_object_or_404(Project, pk=pk, owner=request.user)
     return render(request, "projects/project_detail.html", {"project": project})
+
+
+@login_required
+def project_edit(request, pk):
+    project = get_object_or_404(Project, pk=pk)
+    if project.owner_id != request.user.id:
+        raise PermissionDenied
+
+    if request.method == "POST":
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            form.save()
+            return redirect("project_detail", pk=project.pk)
+    else:
+        form = ProjectForm(instance=project)
+
+    return render(request, "projects/project_form.html", {"form": form, "project": project})
+
+
+@login_required
+def project_delete(request, pk):
+    project = get_object_or_404(Project, pk=pk)
+    if project.owner_id != request.user.id:
+        raise PermissionDenied
+
+    if request.method == "POST":
+        project.delete()
+        messages.success(request, "Project deleted successfully.")
+        return redirect("project_list")
+
+    return render(request, "projects/project_confirm_delete.html", {"project": project})
 
 
 @login_required

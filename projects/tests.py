@@ -109,4 +109,91 @@ class ProjectListAndDetailTests(TestCase):
 
         self.assertContains(response, "No projects yet")
 
+
+class ProjectEditPermissionTests(TestCase):
+    def setUp(self):
+        self.password = "StrongPassword123!"
+        self.owner = User.objects.create_user(username="aman", password=self.password)
+        self.other_user = User.objects.create_user(username="ravi", password=self.password)
+        self.project = Project.objects.create(
+            name="Website Redesign", description="Old description", owner=self.owner
+        )
+
+    def test_anonymous_user_is_redirected_to_login(self):
+        response = self.client.get(f"/projects/{self.project.pk}/edit/")
+        self.assertRedirects(response, f"/login/?next=/projects/{self.project.pk}/edit/")
+
+    def test_owner_can_open_edit_page(self):
+        self.client.login(username="aman", password=self.password)
+        response = self.client.get(f"/projects/{self.project.pk}/edit/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Edit project")
+        self.assertNotContains(response, "owner")
+
+    def test_owner_can_update_name_and_description(self):
+        self.client.login(username="aman", password=self.password)
+        response = self.client.post(
+            f"/projects/{self.project.pk}/edit/",
+            {"name": "Website Revamp", "description": "New description", "owner_id": self.other_user.pk},
+        )
+        self.assertRedirects(response, f"/projects/{self.project.pk}/")
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.name, "Website Revamp")
+        self.assertEqual(self.project.description, "New description")
+        self.assertEqual(self.project.owner, self.owner)
+
+    def test_non_owner_get_is_forbidden(self):
+        self.client.login(username="ravi", password=self.password)
+        self.assertEqual(self.client.get(f"/projects/{self.project.pk}/edit/").status_code, 403)
+
+    def test_non_owner_post_is_forbidden_and_data_unchanged(self):
+        self.client.login(username="ravi", password=self.password)
+        response = self.client.post(
+            f"/projects/{self.project.pk}/edit/",
+            {"name": "Hacked", "description": "Tampered", "owner_id": self.other_user.pk},
+        )
+        self.assertEqual(response.status_code, 403)
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.name, "Website Redesign")
+        self.assertEqual(self.project.description, "Old description")
+        self.assertEqual(self.project.owner, self.owner)
+
+
+class ProjectDeletePermissionTests(TestCase):
+    def setUp(self):
+        self.password = "StrongPassword123!"
+        self.owner = User.objects.create_user(username="aman", password=self.password)
+        self.other_user = User.objects.create_user(username="ravi", password=self.password)
+        self.project = Project.objects.create(name="Website Redesign", owner=self.owner)
+
+    def test_anonymous_user_is_redirected_to_login(self):
+        response = self.client.get(f"/projects/{self.project.pk}/delete/")
+        self.assertRedirects(response, f"/login/?next=/projects/{self.project.pk}/delete/")
+
+    def test_owner_can_view_delete_confirmation(self):
+        self.client.login(username="aman", password=self.password)
+        response = self.client.get(f"/projects/{self.project.pk}/delete/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "This action cannot be undone.")
+
+    def test_owner_can_delete_project_with_post(self):
+        self.client.login(username="aman", password=self.password)
+        response = self.client.post(f"/projects/{self.project.pk}/delete/")
+        self.assertRedirects(response, "/projects/")
+        self.assertFalse(Project.objects.filter(pk=self.project.pk).exists())
+        self.assertTrue(User.objects.filter(pk=self.owner.pk).exists())
+
+    def test_non_owner_get_and_post_are_forbidden(self):
+        self.client.login(username="ravi", password=self.password)
+        url = f"/projects/{self.project.pk}/delete/"
+
+        self.assertEqual(self.client.get(url).status_code, 403)
+        self.assertEqual(self.client.post(url).status_code, 403)
+        self.assertTrue(Project.objects.filter(pk=self.project.pk).exists())
+
+    def test_get_does_not_delete_project(self):
+        self.client.login(username="aman", password=self.password)
+        self.client.get(f"/projects/{self.project.pk}/delete/")
+        self.assertTrue(Project.objects.filter(pk=self.project.pk).exists())
+
 # Create your tests here.
