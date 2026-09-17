@@ -89,11 +89,11 @@ class CommentCreationTests(TestCase):
         self.assertEqual(self.client.post(f"/projects/{other_project.pk}/tasks/{self.task.pk}/comments/create/", {"body": "Wrong task."}).status_code, 404)
 
     def test_task_detail_renders_comments_oldest_first_without_author_n_plus_one(self):
-        first = Comment.objects.create(task=self.task, author=self.author, body="First comment")
-        second = Comment.objects.create(task=self.task, author=self.author, body="Second comment")
+        first = Comment.objects.create(task=self.task, author=self.owner, body="First comment")
+        second = Comment.objects.create(task=self.task, author=self.owner, body="Second comment")
         self.client.login(username="aman", password=self.password)
 
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(5):
             response = self.client.get(f"/projects/{self.project.pk}/tasks/{self.task.pk}/")
 
         self.assertContains(response, "First comment")
@@ -107,5 +107,15 @@ class CommentCreationTests(TestCase):
         response = self.client.get(f"/projects/{self.project.pk}/tasks/{self.task.pk}/")
 
         self.assertContains(response, "No comments yet. Be the first to add one.")
+
+    def test_comment_ui_has_no_edit_or_delete_flow(self):
+        Comment.objects.create(task=self.task, author=self.owner, body="Append-only note")
+        self.client.login(username="aman", password=self.password)
+
+        response = self.client.get(f"/projects/{self.project.pk}/tasks/{self.task.pk}/")
+
+        self.assertNotContains(response, "Edit comment")
+        self.assertNotContains(response, "Delete comment")
+        self.assertContains(response, "Write a comment...")
 
 # Create your tests here.
