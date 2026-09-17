@@ -3,12 +3,12 @@
 {% block content %}
 <section class="auth-card">
     <div class="eyebrow">{{ project.name }}</div>
-    <h1>Add task</h1>
-    <p class="helper">Create a task for this project.</p>
+    <h1>{% if task %}Edit task{% else %}Add task{% endif %}</h1>
+    <p class="helper">{% if task %}Update this task's details.{% else %}Create a task for this project.{% endif %}</p>
     <form method="post">
         {% csrf_token %}
         {% for field in form %}<div class="form-group">{{ field.label_tag }}{{ field }}{% for error in field.errors %}<p class="form-error">{{ error }}</p>{% endfor %}</div>{% endfor %}
-        <div class="form-actions"><a class="btn btn-secondary" href="{% url 'project_detail' project.pk %}">Cancel</a><button class="btn btn-primary" type="submit">Create task</button></div>
+        <div class="form-actions"><a class="btn btn-secondary" href="{% if task %}{% url 'task_detail' project.pk task.pk %}{% else %}{% url 'project_detail' project.pk %}{% endif %}">Cancel</a><button class="btn btn-primary" type="submit">{% if task %}Save changes{% else %}Create task{% endif %}</button></div>
     </form>
 </section>
 {% endblock %}

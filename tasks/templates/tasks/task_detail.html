@@ -11,5 +11,6 @@
         <dt>Due date</dt><dd>{{ task.due_date }}</dd>
         <dt>Assigned to</dt><dd>{% if task.assigned_to %}{{ task.assigned_to.username }}{% else %}Unassigned{% endif %}</dd>
     </dl>
+    {% if user == task.project.owner %}<div class="project-actions"><a class="btn btn-primary" href="{% url 'task_edit' task.project.pk task.pk %}">Edit task</a></div>{% endif %}
 </section>
 {% endblock %}
