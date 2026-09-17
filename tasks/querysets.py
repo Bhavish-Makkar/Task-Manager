@@ -4,7 +4,16 @@ from .models import Task
 def assigned_tasks_for(user):
     """Return only tasks assigned to the given user, with display relations loaded."""
     return (
-        Task.objects.filter(assigned_to=user)
+        Task.objects.assigned_to_user(user)
+        .select_related("project", "assigned_to")
+        .order_by("due_date")
+    )
+
+
+def overdue_tasks_for(user, today=None):
+    return (
+        Task.objects.assigned_to_user(user)
+        .overdue(today=today)
         .select_related("project", "assigned_to")
         .order_by("due_date")
     )

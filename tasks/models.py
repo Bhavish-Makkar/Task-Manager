@@ -4,6 +4,17 @@ from django.db import models
 from projects.models import Project
 
 
+class TaskQuerySet(models.QuerySet):
+    def assigned_to_user(self, user):
+        return self.filter(assigned_to=user)
+
+    def overdue(self, today=None):
+        from django.utils import timezone
+
+        today = today or timezone.localdate()
+        return self.filter(due_date__lt=today).exclude(status=Task.Status.DONE)
+
+
 class Task(models.Model):
     class Status(models.TextChoices):
         TODO = "TODO", "To Do"
@@ -27,6 +38,8 @@ class Task(models.Model):
         blank=True,
         related_name="assigned_tasks",
     )
+
+    objects = TaskQuerySet.as_manager()
 
     def __str__(self):
         return self.title

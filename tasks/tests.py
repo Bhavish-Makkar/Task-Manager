@@ -65,6 +65,16 @@ class TaskModelTests(TestCase):
 
         self.assertIsNone(task.assigned_to)
 
+    def test_overdue_query_matches_date_and_status_rules(self):
+        today = date(2026, 9, 17)
+        overdue_todo = Task.objects.create(title="Old todo", status=Task.Status.TODO, due_date=date(2026, 9, 15), project=self.project, assigned_to=self.assignee)
+        overdue_progress = Task.objects.create(title="Old progress", status=Task.Status.IN_PROGRESS, due_date=date(2026, 9, 16), project=self.project, assigned_to=self.assignee)
+        Task.objects.create(title="Old done", status=Task.Status.DONE, due_date=date(2026, 9, 15), project=self.project, assigned_to=self.assignee)
+        Task.objects.create(title="Today", status=Task.Status.TODO, due_date=today, project=self.project, assigned_to=self.assignee)
+        Task.objects.create(title="Future", status=Task.Status.TODO, due_date=date(2026, 9, 18), project=self.project, assigned_to=self.assignee)
+
+        self.assertEqual(list(Task.objects.overdue(today=today)), [overdue_todo, overdue_progress])
+
 
 class TaskCreationTests(TestCase):
     def setUp(self):

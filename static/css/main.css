@@ -26,6 +26,10 @@ a:hover { text-decoration: underline; }
 .auth-card, .dashboard-card { background: var(--surface); border: 1px solid var(--line); border-radius: 1rem; box-shadow: 0 14px 40px #1720330d; margin: auto; max-width: 440px; padding: clamp(1.5rem, 5vw, 2.5rem); }
 .dashboard-card { max-width: 720px; }
 .dashboard-board { display: grid; gap: 1rem; grid-template-columns: repeat(3, 1fr); margin-top: 1.5rem; }
+.overdue-section { margin: 1.5rem auto; max-width: 1120px; }
+.overdue-count { background: #fff0ef; border-radius: 999px; color: var(--danger); font-size: .8rem; padding: .2rem .55rem; }
+.overdue-task { display: inline-grid; margin-right: .75rem; min-width: 220px; }
+.overdue-task b { color: var(--danger); font-size: .75rem; }
 .task-column { background: #eef0f6; border: 1px solid var(--line); border-radius: .9rem; min-height: 220px; padding: 1rem; }
 .column-heading { align-items: center; display: flex; justify-content: space-between; margin-bottom: 1rem; }
 .column-heading h2 { font-size: 1rem; margin: 0; }
