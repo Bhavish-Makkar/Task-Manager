@@ -25,6 +25,15 @@ a:hover { text-decoration: underline; }
 .page-shell { margin: 0 auto; max-width: 1120px; padding: clamp(2rem, 8vw, 6rem) 1rem; }
 .auth-card, .dashboard-card { background: var(--surface); border: 1px solid var(--line); border-radius: 1rem; box-shadow: 0 14px 40px #1720330d; margin: auto; max-width: 440px; padding: clamp(1.5rem, 5vw, 2.5rem); }
 .dashboard-card { max-width: 720px; }
+.dashboard-board { display: grid; gap: 1rem; grid-template-columns: repeat(3, 1fr); margin-top: 1.5rem; }
+.task-column { background: #eef0f6; border: 1px solid var(--line); border-radius: .9rem; min-height: 220px; padding: 1rem; }
+.column-heading { align-items: center; display: flex; justify-content: space-between; margin-bottom: 1rem; }
+.column-heading h2 { font-size: 1rem; margin: 0; }
+.column-heading span { background: var(--surface); border-radius: 999px; color: var(--muted); font-size: .8rem; padding: .2rem .55rem; }
+.dashboard-task { background: var(--surface); border: 1px solid var(--line); border-radius: .65rem; color: var(--ink); display: grid; gap: .25rem; margin-bottom: .75rem; padding: .85rem; }
+.dashboard-task:hover { border-color: var(--accent); text-decoration: none; }
+.dashboard-task small { color: var(--muted); }
+@media (max-width: 760px) { .dashboard-board { grid-template-columns: 1fr; } }
 .eyebrow { color: var(--accent); font-size: .8rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); line-height: 1.15; margin: .5rem 0; }
 .helper, .form-footer { color: var(--muted); }

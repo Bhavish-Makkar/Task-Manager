@@ -8,3 +8,10 @@ def assigned_tasks_for(user):
         .select_related("project", "assigned_to")
         .order_by("due_date")
     )
+
+
+def group_tasks_by_status(tasks):
+    groups = {status: [] for status, _label in Task.Status.choices}
+    for task in tasks:
+        groups.setdefault(task.status, []).append(task)
+    return groups
