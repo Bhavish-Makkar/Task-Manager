@@ -65,6 +65,14 @@ class ProjectCreationTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Project.objects.filter(description="Details").exists())
 
+    def test_project_form_does_not_expose_owner_field(self):
+        self.client.login(username="aman", password=self.password)
+
+        response = self.client.get("/projects/create/")
+
+        self.assertNotContains(response, 'name="owner"')
+        self.assertNotContains(response, 'name="owner_id"')
+
 
 class ProjectListAndDetailTests(TestCase):
     def setUp(self):

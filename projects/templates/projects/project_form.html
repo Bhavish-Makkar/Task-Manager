@@ -14,7 +14,10 @@
                 {% for error in field.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
             </div>
         {% endfor %}
-        <button class="btn btn-primary" type="submit">{% if project %}Save changes{% else %}Create project{% endif %}</button>
+        <div class="form-actions">
+            <a class="btn btn-secondary" href="{% if project %}{% url 'project_detail' project.pk %}{% else %}{% url 'project_list' %}{% endif %}">Cancel</a>
+            <button class="btn btn-primary" type="submit">{% if project %}Save changes{% else %}Create project{% endif %}</button>
+        </div>
     </form>
 </section>
 {% endblock %}
