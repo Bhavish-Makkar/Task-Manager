@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Q
+from django.db.models import Prefetch
 
 from .forms import ProjectForm
 from .models import Project
@@ -28,10 +29,15 @@ def project_create(request):
 
 @login_required
 def project_detail(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(
+        Project.objects.prefetch_related(
+            Prefetch("tasks", queryset=Task.objects.select_related("assigned_to").order_by("due_date"))
+        ),
+        pk=pk,
+    )
     if not can_view_project(request.user, project):
         raise PermissionDenied
-    tasks = project.tasks.select_related("assigned_to").order_by("due_date")
+    tasks = list(project.tasks.all())
     raw_counts = {row["status"]: row["count"] for row in status_counts_for_project(project)}
     status_counts = [(label, raw_counts.get(value, 0)) for value, label in Task.Status.choices]
     return render(request, "projects/project_detail.html", {"project": project, "tasks": tasks, "status_counts": status_counts})
