@@ -41,6 +41,11 @@ class Task(models.Model):
 
     objects = TaskQuerySet.as_manager()
 
+    class Meta:
+        indexes = [
+            models.Index(fields=("assigned_to", "due_date", "status"), name="task_assignee_due_status_idx"),
+        ]
+
     def __str__(self):
         return self.title
 
